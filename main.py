@@ -137,8 +137,10 @@ def downloadComic(link):
                         
                         print("")
             else:
+                chapter_index += 1
                 print(f"Skipping chapter {chapter_index}: {chapter['title']}. Because it's nsfw")
         else:
+            chapter_index += 1
             print(f"Skipping chapter {chapter_index}: {chapter['title']}. Because not free")
 
             
