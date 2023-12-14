@@ -90,58 +90,59 @@ def downloadComic(link):
     chapter_index_parts = 0
     part_count = 0
     for chapter in chapters:
-        if chapter["free"]:
-            if not chapter["nsfw"] or args.download_nsfw:
-                chapter_index += 1
-                chapter_index_parts += 1
-                print(f"Downloading chapter {chapter_index}: {chapter['title']}")
-                downloadChapter(f"https://tapas.io/episode/{chapter['id']}", title, chapter_index)
+        if not chapter["scheduled"]: # the chapter is not published yet
+            if chapter["free"]:
+                if not chapter["nsfw"] or args.download_nsfw:
+                    chapter_index += 1
+                    chapter_index_parts += 1
+                    print(f"Downloading chapter {chapter_index}: {chapter['title']}")
+                    downloadChapter(f"https://tapas.io/episode/{chapter['id']}", title, chapter_index)
 
-                book_chapter = epub.EpubHtml(title=chapter["title"], file_name=f"chapter{chapter_index}.xhtml")
-                book_chapter.content = '<body style="margin: 0;">'
+                    book_chapter = epub.EpubHtml(title=chapter["title"], file_name=f"chapter{chapter_index}.xhtml")
+                    book_chapter.content = '<body style="margin: 0;">'
 
-                imgs = sorted(os.listdir(f"data/{make_safe_filename_windows(title)}/{chapter_index}"), key=getNumericIndex)
-                for img in imgs:
-                    print(f"\rAdding image {getNumericIndex(img)}/{len(imgs)} to comic", end="")
-                    image = epub.EpubItem(file_name=f"chapter{chapter_index}/{img}", content=open(f"data/{make_safe_filename_windows(title)}/{chapter_index}/{img}", "rb").read())
-                    book.add_item(image)
-                    book_chapter.content += f'<img style="height: 100%;" src="chapter{chapter_index}/{img}"/>'
-                print("")
+                    imgs = sorted(os.listdir(f"data/{make_safe_filename_windows(title)}/{chapter_index}"), key=getNumericIndex)
+                    for img in imgs:
+                        print(f"\rAdding image {getNumericIndex(img)}/{len(imgs)} to comic", end="")
+                        image = epub.EpubItem(file_name=f"chapter{chapter_index}/{img}", content=open(f"data/{make_safe_filename_windows(title)}/{chapter_index}/{img}", "rb").read())
+                        book.add_item(image)
+                        book_chapter.content += f'<img style="height: 100%;" src="chapter{chapter_index}/{img}"/>'
+                    print("")
 
-                book_chapter.content += "</body>"
+                    book_chapter.content += "</body>"
 
-                # Add chapter to the book
-                book.add_item(book_chapter)
-                book.toc.append(epub.Link(f"chapter{chapter_index}.xhtml", chapter["title"], f"chapter{chapter_index}"))
+                    # Add chapter to the book
+                    book.add_item(book_chapter)
+                    book.toc.append(epub.Link(f"chapter{chapter_index}.xhtml", chapter["title"], f"chapter{chapter_index}"))
 
-                book.spine.append(book_chapter)
+                    book.spine.append(book_chapter)
 
-                print("") # Add empty line at the end of a chapter
-                if args.split_into_parts:
-                    if chapter_index_parts == args.chapters_per_part:
-                        chapter_index_parts = 0
-                        part_count += 1
+                    print("") # Add empty line at the end of a chapter
+                    if args.split_into_parts:
+                        if chapter_index_parts == args.chapters_per_part:
+                            chapter_index_parts = 0
+                            part_count += 1
 
-                        # Add default NCX and Nav file
-                        book.add_item(epub.EpubNcx())
-                        book.add_item(epub.EpubNav())
+                            # Add default NCX and Nav file
+                            book.add_item(epub.EpubNcx())
+                            book.add_item(epub.EpubNav())
 
-                        # Save the ePub
-                        print(f"Saving comic part {part_count}")
-                        epub.write_epub(f"{make_safe_filename_windows(title)} - Part {part_count}.epub", book, {})
+                            # Save the ePub
+                            print(f"Saving comic part {part_count}")
+                            epub.write_epub(f"{make_safe_filename_windows(title)} - Part {part_count}.epub", book, {})
 
-                        book = epub.EpubBook()
-                        book.set_title(f"{title} - Part {part_count + 1}")
-                        book.add_author(authors)
-                        book.spine = ["nav"]
-                        
-                        print("")
+                            book = epub.EpubBook()
+                            book.set_title(f"{title} - Part {part_count + 1}")
+                            book.add_author(authors)
+                            book.spine = ["nav"]
+                            
+                            print("")
+                else:
+                    chapter_index += 1
+                    print(f"Skipping chapter {chapter_index}: {chapter['title']}. Because it's nsfw")
             else:
                 chapter_index += 1
-                print(f"Skipping chapter {chapter_index}: {chapter['title']}. Because it's nsfw")
-        else:
-            chapter_index += 1
-            print(f"Skipping chapter {chapter_index}: {chapter['title']}. Because not free")
+                print(f"Skipping chapter {chapter_index}: {chapter['title']}. Because not free")
 
             
     if not args.split_into_parts:
