@@ -90,7 +90,7 @@ def downloadComic(link):
     chapter_index_parts = 0
     part_count = 0
     for chapter in chapters:
-        if chapter["free"]: # broken need to fix
+        if chapter["free"]:
             if not chapter["nsfw"] or args.download_nsfw:
                 chapter_index += 1
                 chapter_index_parts += 1
