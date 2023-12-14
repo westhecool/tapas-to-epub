@@ -90,11 +90,11 @@ def downloadComic(link):
     chapter_index_parts = 0
     part_count = 0
     for chapter in chapters:
+        chapter_index += 1 # always increment chapter index
         if not chapter["scheduled"]: # the chapter is not published yet
             if chapter["free"]:
                 if not chapter["nsfw"] or args.download_nsfw:
-                    chapter_index += 1
-                    chapter_index_parts += 1
+                    chapter_index_parts += 1 # only increment chapter index for part spliter if the chapter is being downloaded
                     print(f"Downloading chapter {chapter_index}: {chapter['title']}")
                     downloadChapter(f"https://tapas.io/episode/{chapter['id']}", title, chapter_index)
 
@@ -138,10 +138,8 @@ def downloadComic(link):
                             
                             print("")
                 else:
-                    chapter_index += 1
                     print(f"Skipping chapter {chapter_index}: {chapter['title']}. Because it's nsfw")
             else:
-                chapter_index += 1
                 print(f"Skipping chapter {chapter_index}: {chapter['title']}. Because not free")
 
             
