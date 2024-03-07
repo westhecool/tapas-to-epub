@@ -5,6 +5,7 @@ from PIL import Image
 import argparse
 import shutil
 import requests
+import time
 import io
 import re
 
@@ -173,4 +174,15 @@ def downloadComic(link):
     print("\n") # Add 2 empty lines at the end of a book
 
 for link in args.link.split(','):
-    downloadComic(link)
+    def f():
+        global chapter_page_count_total
+        chapter_page_count_total = 0
+        try:
+            downloadComic(link)
+        except Exception as e:
+            print('Failed to download comic.')
+            print(e)
+            print('Retrying in 5 seconds...')
+            time.sleep(5)
+            f()
+    f()
