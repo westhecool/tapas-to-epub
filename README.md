@@ -15,7 +15,7 @@ python3 -m venv venv
 ```sh
 ./venv/bin/python3 main.py [link to chapter list of tapas series]
 ```
-The input **must** be a link to the chapter list of the tapas series. Please do not use the mobile version of the site as it's not tested.
+The input **must** be a link to the chapter list of the tapas series. It will look something like this: "https://tapas.io/series/xxxxxx/info". Please do not use the mobile version of the site as it's not tested.
 
 ## Splitting A Comic Into Parts
 You can use the option `--split-into-parts` (Not enabled by default.) to split the comic into multiple files. By default, it splits every 100 chapters into a different file. You can adjust it with the argument `--chapters-per-part N`.
